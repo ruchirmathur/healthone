@@ -1,0 +1,17 @@
+[
+  {
+    "id": "APP001",
+    "pdf": "/pdfs/app001.pdf",
+    "status": "Approved"
+  },
+  {
+    "id": "APP002",
+    "pdf": "/pdfs/app002.pdf",
+    "status": "Pending"
+  },
+  {
+    "id": "APP003",
+    "pdf": "/pdfs/app003.pdf",
+    "status": "Rejected"
+  }
+]
