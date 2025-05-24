@@ -9,9 +9,9 @@ interface Auth0ProviderWithNavigateProps {
 export const Auth0ProviderWithNavigate: React.FC<Auth0ProviderWithNavigateProps> = ({ children }) => {
   const navigate = useNavigate();
   
-  const domain = process.env.REACT_APP_AUTH0_DOMAIN;
-  const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID;
-  const redirectUri = process.env.REACT_APP_AUTH0_CALLBACK_URL;
+  const domain = "dev-heroxqvns2qzfndo.us.auth0.com";
+  const clientId = "yTSV5aVSvLok7CcqyZMhhS0Pz9TZ8nw2";
+  const redirectUri = "https://calm-beach-0223a350f.6.azurestaticapps.net/callback";
 
   const onRedirectCallback = (appState?: { returnTo?: string }) => {
     navigate(appState?.returnTo || '/dashboard');
