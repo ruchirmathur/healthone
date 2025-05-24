@@ -155,7 +155,7 @@ const DocumentReviewDialog: React.FC<DocumentReviewDialogProps> = ({
     setResult(null);
     setError(null);
 
-    fetch('http://127.0.0.1:9000/api/document-review', {
+    fetch(`${process.env.REACT_APP_API_HOST}/api/document-review`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url: docId }),
@@ -261,7 +261,7 @@ export const Dashboard: React.FC = () => {
     setTableError(null);
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/ask', {
+      const response = await fetch(`${process.env.REACT_APP_API_HOST}/api/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_input: chatInput }),
@@ -355,8 +355,6 @@ export const Dashboard: React.FC = () => {
           >
             AI Copilot for Underwriting
           </Typography>
-
-          {/* Copilot Chat Area */}
           <Paper sx={{
             p: { xs: 1, md: 3 },
             borderRadius: 4,
@@ -475,7 +473,6 @@ export const Dashboard: React.FC = () => {
               </IconButton>
             </Stack>
           </Paper>
-
           {apiTableData && apiTableData.length > 0 && visibleHeaders.length > 0 && (
             <Fade in>
               <Paper sx={{

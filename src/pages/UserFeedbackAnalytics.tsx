@@ -27,7 +27,7 @@ import {
   Line,
 } from "recharts";
 
-const API_URL = "http://127.0.0.1:5000/api/ask";
+const API_URL = `${process.env.REACT_APP_API_HOST}/api/ask`;
 
 type Analysis = {
   key_issues: string[];

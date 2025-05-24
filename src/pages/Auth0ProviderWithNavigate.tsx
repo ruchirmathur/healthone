@@ -8,14 +8,13 @@ interface Auth0ProviderWithNavigateProps {
 
 export const Auth0ProviderWithNavigate: React.FC<Auth0ProviderWithNavigateProps> = ({ children }) => {
   const navigate = useNavigate();
-
-
-  const domain = "dev-heroxqvns2qzfndo.us.auth0.com";
-  const clientId = "HN7Z53U7YoGfx3R4DJbeLuvx8PQ7F9Uz";
-  const redirectUri = "http://localhost:3001/dashboard";
+  
+  const domain = process.env.REACT_APP_AUTH0_DOMAIN;
+  const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID;
+  const redirectUri = process.env.REACT_APP_AUTH0_CALLBACK_URL;
 
   const onRedirectCallback = (appState?: { returnTo?: string }) => {
-    navigate(appState?.returnTo || window.location.pathname);
+    navigate(appState?.returnTo || '/dashboard');
   };
 
   if (!(domain && clientId && redirectUri)) {
@@ -27,7 +26,7 @@ export const Auth0ProviderWithNavigate: React.FC<Auth0ProviderWithNavigateProps>
       domain={domain}
       clientId={clientId}
       authorizationParams={{
-        redirect_uri: redirectUri,
+        redirect_uri: redirectUri
       }}
       onRedirectCallback={onRedirectCallback}
     >

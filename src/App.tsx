@@ -1,51 +1,48 @@
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Outlet } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import AutoLogin from './pages/AutoLogin';
+import { AutoLogin } from './pages/AutoLogin';
 import Dashboard from './pages/Dashboard';
 import HospitalPriceDashboard from './pages/HospitalPriceDashboard';
 import UserFeedbackAnalytics from './pages/UserFeedbackAnalytics';
 import MemberHealthCopilotDashboard from './pages/MemberHealthCopilotDashboard';
-
+import { AuthenticationGuard } from './pages/authentication-guard';
+import NotFound from './pages/NotFound';
 import { useAuth0 } from '@auth0/auth0-react';
 import './App.css';
-import { AuthenticationGuard } from './pages/authentication-guard';
-
 
 function App() {
+  const { isLoading } = useAuth0();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div style={{ display: 'flex', height: '100vh' }}>
-      <Sidebar />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <Header />
-        <main style={{ flex: 1, padding: '20px', background: '#f5f5f5' }}>
-          <Routes>
-           <Route
-              path="/"
-              element={<AuthenticationGuard component={AutoLogin} />}
-            />
-            <Route
-              path="/dashboard"
-              element={<AuthenticationGuard component={Dashboard} />}
-            />
-            <Route
-              path="/hospital"
-              element={<AuthenticationGuard component={HospitalPriceDashboard} />}
-            />
-            <Route
-              path="/feedback"
-              element={<AuthenticationGuard component={UserFeedbackAnalytics} />}
-            />
-             <Route
-              path="/memberdashboard"
-              element={<AuthenticationGuard component={MemberHealthCopilotDashboard} />}
-            />
-          </Routes>
-        </main>
-      </div>
-    </div>
+    <Routes>
+      <Route path="/" element={<AutoLogin />} />
+      <Route path="/callback" element={<div>Processing login...</div>} />
+      <Route element={<AuthenticationGuard component={ProtectedLayout} />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/hospital" element={<HospitalPriceDashboard />} />
+        <Route path="/feedback" element={<UserFeedbackAnalytics />} />
+        <Route path="/memberdashboard" element={<MemberHealthCopilotDashboard />} />
+      </Route>
+      <Route path="/404" element={<NotFound />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
+
+const ProtectedLayout = () => (
+  <div className="app-container">
+    <Header />
+    <Sidebar />
+    <div className="main-content">
+      <Outlet />
+    </div>
+  </div>
+);
 
 export default App;

@@ -1,23 +1,26 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const AutoLogin: React.FC = () => {
-  const { isAuthenticated, loginWithRedirect } = useAuth0();
+  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAuthAndRedirect = async () => {
-      if (!isAuthenticated) {
-        await loginWithRedirect({
-          appState: {
-            returnTo: "/dashboard",
-          },
+    if (!isLoading) {
+      if (isAuthenticated) {
+        navigate('/dashboard', { replace: true });
+      } else {
+        loginWithRedirect({
+          appState: { returnTo: '/dashboard' }
         });
       }
-    };
+    }
+  }, [isAuthenticated, isLoading, loginWithRedirect, navigate]);
 
-    checkAuthAndRedirect();
-  }, [isAuthenticated, loginWithRedirect]);
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
-  return null; // Render nothing as this component's purpose is just to handle redirection
+  return null;
 };
-export default AutoLogin;

@@ -89,9 +89,10 @@ export const HospitalPriceDashboard: React.FC = () => {
     setFinalResponse('');
     setHospitalResults([]);
     try {
-      const response = await axios.post<ApiResponse>('http://127.0.0.1:5000/api/ask', {
-        user_input: userInput
-      });
+      const response = await axios.post<ApiResponse>(
+        `${process.env.REACT_APP_API_HOST}/api/ask`,
+        { user_input: userInput }
+      );
       setAnalysis(response.data.analysis);
       setFinalResponse(response.data.final_response);
       const hospitalFn = response.data.results?.find(r => r.function === 'hospital');
@@ -215,7 +216,6 @@ export const HospitalPriceDashboard: React.FC = () => {
           {error}
         </Typography>
       )}
-
       {/* Price Overview & Charts */}
       {analysis && (
         <Box sx={{ maxWidth: 950, mx: 'auto' }}>
@@ -377,7 +377,6 @@ export const HospitalPriceDashboard: React.FC = () => {
               * All prices reflect payer-negotiated rates, plan, and setting, as required by the CMS Hospital Price Transparency Rule.
             </Typography>
           </Paper>
-
           {/* Cost Saving Tips */}
           {analysis.cost_saving_tips.length > 0 && (
             <Paper sx={{ p: 3, mb: 4, borderRadius: 4 }}>
