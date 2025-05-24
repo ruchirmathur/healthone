@@ -4,7 +4,7 @@ import {
   Accordion, AccordionSummary, AccordionDetails, Chip, Table, TableBody,
   TableCell, TableRow, TableHead, TableContainer, List, ListItem, ListItemText
 } from '@mui/material';
-import { LocalHospital, AttachMoney, LocationOn, ExpandMore, Info, Search } from '@mui/icons-material';
+import { LocalHospital, LocationOn, ExpandMore, Info, Search } from '@mui/icons-material';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 import axios from 'axios';
 
