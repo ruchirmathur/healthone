@@ -1,6 +1,20 @@
 name: Azure Static Web Apps CI/CD
 
 on:
+  workflow_dispatch:
+    inputs:
+      client_id:
+        description: 'Okta Client ID'
+        required: false
+      okta_domain:
+        description: 'Okta Domain'
+        required: false
+      redirect_url:
+        description: 'Redirect URL'
+        required: false
+      api_url:
+        description: 'API URL'
+        required: false
   push:
     branches:
       - main
@@ -11,7 +25,7 @@ on:
 
 jobs:
   build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     permissions:
@@ -45,6 +59,11 @@ jobs:
           output_location: "build" # Built app content directory - optional
           github_id_token: ${{ steps.idtoken.outputs.result }}
           ###### End of Repository/Build Configurations ######
+        env:
+          REACT_APP_OKTA_CLIENT_ID: ${{ github.event.inputs.client_id }}
+          REACT_APP_OKTA_DOMAIN: ${{ github.event.inputs.okta_domain }}
+          REACT_APP_REDIRECT_URL: ${{ github.event.inputs.redirect_url }}
+          REACT_APP_API_HOST: ${{ github.event.inputs.api_url }}
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
