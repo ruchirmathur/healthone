@@ -60,9 +60,9 @@ jobs:
           github_id_token: ${{ steps.idtoken.outputs.result }}
           ###### End of Repository/Build Configurations ######
         env:
-          REACT_APP_OKTA_CLIENT_ID: ${{ github.event.inputs.client_id }}
-          REACT_APP_OKTA_DOMAIN: ${{ github.event.inputs.okta_domain }}
-          REACT_APP_REDIRECT_URL: ${{ github.event.inputs.redirect_url }}
+          REACT_APP_AUTH0_CLIENT_ID: ${{ github.event.inputs.client_id }}
+          REACT_APP_AUTH0_DOMAIN: ${{ github.event.inputs.okta_domain }}
+          REACT_APP_AUTH0_CALLBACK_URL: ${{ github.event.inputs.redirect_url }}
           REACT_APP_API_HOST: ${{ github.event.inputs.api_url }}
 
   close_pull_request_job:
