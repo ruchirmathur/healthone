@@ -37,7 +37,7 @@ export default function App() {
           const claims = await getIdTokenClaims();
           const org = claims?.org_name || claims?.['https://yourdomain/org_name'] || '';
           const response = await fetch(
-            `${process.env.REACT_APP_API_BUILDER_HOST}/data?org=${encodeURIComponent(org)}`
+            `${process.env.REACT_APP_API_BUILDER_HOST}/retrieve/${encodeURIComponent(org)}`
           );
           
           if (!response.ok) throw new Error('API failed');
