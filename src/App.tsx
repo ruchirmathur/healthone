@@ -33,7 +33,7 @@ function App() {
           const org = claims?.org_name || claims?.['https://yourdomain/org_name'] || '';
           const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
           
-          return fetch(`${apiHost}/data?org=${encodeURIComponent(org)}`)
+          return fetch(`${apiHost}/retrieve/${encodeURIComponent(org)}`)
             .then(response => {
               if (!response.ok) throw new Error('API failed');
               return response.json();
