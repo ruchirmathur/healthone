@@ -48,8 +48,22 @@ const navItems = [
   }
 ];
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  selectedUseCase?: string;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase }) => {
   const location = useLocation();
+
+  const filteredNavItems = navItems.filter(item => {
+    if (
+      item.text === 'Hospital Transparency' &&
+      selectedUseCase !== 'Healthcare Price Transparency'
+    ) {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <Drawer
@@ -78,7 +92,7 @@ const Sidebar: React.FC = () => {
       <Divider sx={{ mb: 1 }} />
       <Box sx={{ flex: 1, overflow: 'auto' }}>
         <List>
-          {navItems.map(({ text, icon, path }) => (
+          {filteredNavItems.map(({ text, icon, path }) => (
             <ListItemButton
               key={text}
               component={Link}
