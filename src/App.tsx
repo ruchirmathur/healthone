@@ -1,116 +1,80 @@
 import React, { useEffect, useState } from 'react';
-import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
-import Sidebar from './components/Sidebar';
-import Header from './components/Header';
-import { AutoLogin } from './pages/AutoLogin';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
+import Loader from './components/Loader';
+import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import HospitalPriceDashboard from './pages/HospitalPriceDashboard';
 import UserFeedbackAnalytics from './pages/UserFeedbackAnalytics';
 import MemberHealthCopilotDashboard from './pages/MemberHealthCopilotDashboard';
-import { AuthenticationGuard } from './pages/authentication-guard';
 import NotFound from './pages/NotFound';
-import { useAuth0 } from '@auth0/auth0-react';
-import './App.css';
 
 interface ApiData {
-  selectedUseCase?: string;
+  selectedUseCase: string;
 }
 
-function App() {
+const useCaseRoutes: Record<string, string> = {
+  'Healthcare Price Transparency': '/hospital',
+  'User Feedback Analysis Dashboard': '/feedback',
+  'Member Dashboard': '/memberdashboard',
+  'Voice enabled Healthcare Price Transparency': '/voice-enabled'
+};
+
+export default function App() {
   const { isLoading: authLoading, isAuthenticated, getIdTokenClaims } = useAuth0();
   const [apiData, setApiData] = useState<ApiData | null>(null);
   const [apiLoading, setApiLoading] = useState(true);
   const navigate = useNavigate();
-  const location = useLocation();
 
   // Combined loading state
   const isLoading = authLoading || apiLoading;
 
+  // Get API data after authentication
   useEffect(() => {
-    if (isAuthenticated && !apiData) {
-      getIdTokenClaims()
-        .then(claims => {
+    const fetchData = async () => {
+      if (isAuthenticated && !apiData) {
+        try {
+          const claims = await getIdTokenClaims();
           const org = claims?.org_name || claims?.['https://yourdomain/org_name'] || '';
-          const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
+          const response = await fetch(
+            `${process.env.REACT_APP_API_BUILDER_HOST}/data?org=${encodeURIComponent(org)}`
+          );
           
-          return fetch(`${apiHost}/retrieve/${encodeURIComponent(org)}`)
-            .then(response => {
-              if (!response.ok) throw new Error('API failed');
-              return response.json();
-            })
-            .then(data => {
-              setApiData(data);
-              setApiLoading(false);
-              
-              // Redirect to correct route after API load
-              const targetPath = getPathForUseCase(data.selectedUseCase);
-              if (location.pathname !== targetPath) {
-                navigate(targetPath, { replace: true });
-              }
-            });
-        })
-        .catch(error => {
-          console.error('API Error:', error);
+          if (!response.ok) throw new Error('API failed');
+          const data = await response.json();
+          
+          setApiData(data);
           setApiLoading(false);
+          
+          // Redirect to proper route if not already there
+          const targetPath = useCaseRoutes[data.selectedUseCase] || '/dashboard';
+          if (window.location.pathname !== targetPath) {
+            navigate(targetPath, { replace: true });
+          }
+        } catch (error) {
+          console.error(error);
           navigate('/404');
-        });
-    }
-  }, [isAuthenticated, apiData, navigate, location.pathname, getIdTokenClaims]);
+        }
+      }
+    };
 
-  const getPathForUseCase = (useCase?: string) => {
-    switch (useCase) {
-      case 'Healthcare Price Transparency':
-        return '/hospital';
-      case 'User Feedback Analysis Dashboard':
-        return '/feedback';
-      case 'Member Dashboard':
-        return '/memberdashboard';
-      case 'Voice enabled Healthcare Price Transparency':
-        return '/voice-enabled';
-      default:
-        return '/dashboard';
-    }
-  };
+    fetchData();
+  }, [isAuthenticated, apiData, navigate, getIdTokenClaims]);
 
-  if (isLoading) {
-    return (
-      <div className="full-page-loader">
-        <div className="loader-content">
-          <h2>Loading Application</h2>
-          <div className="spinner"></div>
-        </div>
-      </div>
-    );
-  }
-
-  const ProtectedLayout = () => (
-    <div className="app-container">
-      <Header />
-      <Sidebar selectedUseCase={apiData?.selectedUseCase} />
-      <div className="main-content">
-        <Routes>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/hospital" element={<HospitalPriceDashboard />} />
-          <Route path="/feedback" element={<UserFeedbackAnalytics />} />
-          <Route path="/memberdashboard" element={<MemberHealthCopilotDashboard />} />
-          <Route path="/voice-enabled" element={<div>Voice Enabled View</div>} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </div>
-    </div>
-  );
+  if (isLoading) return <Loader message="Loading application..." />;
 
   return (
-    <Routes>
-      <Route path="/" element={<AutoLogin />} />
-      <Route path="/callback" element={<div>Processing login...</div>} />
-      <Route element={<AuthenticationGuard component={ProtectedLayout} />}>
-        <Route index element={<div />} /> {/* Empty element for layout */}
-      </Route>
-      <Route path="/404" element={<NotFound />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <Layout selectedUseCase={apiData?.selectedUseCase}>
+      <Routes>
+        <Route path="/" element={<Navigate to={apiData ? useCaseRoutes[apiData.selectedUseCase] : '/dashboard'} replace />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/hospital" element={<HospitalPriceDashboard />} />
+        <Route path="/feedback" element={<UserFeedbackAnalytics />} />
+        <Route path="/memberdashboard" element={<MemberHealthCopilotDashboard />} />
+        <Route path="/voice-enabled" element={<div>Voice Enabled View</div>} />
+        <Route path="/404" element={<NotFound />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Layout>
   );
 }
-
-export default App;
