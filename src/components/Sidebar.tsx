@@ -20,49 +20,85 @@ import { Link, useLocation } from 'react-router-dom';
 const drawerWidth = 240;
 const headerHeight = 64;
 
-const navItems = [
+interface NavItem {
+  text: string;
+  icon: React.ReactNode;
+  path: string;
+  showForUseCases?: string[];
+}
+
+const navItems: NavItem[] = [
   {
-    text: 'Underwriters Dashboard',
+    text: 'Healthcare Underwriter Dashboard',
     icon: <DashboardIcon />,
-    path: '/dashboard'
+    path: '/dashboard',
+    showForUseCases: ['Healthcare Underwriter Dashboard']
   },
   {
-    text: 'User Feedback Analytics',
+    text: 'User Feedback Analysis Dashboard',
     icon: <InsightsIcon />,
-    path: '/feedback'
+    path: '/feedback',
+    showForUseCases: ['User Feedback Analysis Dashboard']
   },
   {
-    text: 'Hospital Transparency',
+    text: 'Healthcare Price Transparency',
     icon: <LocalHospitalIcon />,
-    path: '/hospital'
+    path: '/hospital',
+    showForUseCases: ['Healthcare Price Transparency']
   },
   {
     text: 'Member Dashboard',
     icon: <CardGiftcardIcon />,
-    path: '/memberdashboard'
+    path: '/memberdashboard',
+    showForUseCases: ['Member Dashboard']
   },
   {
-    text: 'Audio Accessible App',
+    text: 'Voice Enabled Healthcare Price Transparency',
     icon: <HearingIcon />,
-    path: '/audioaccessible'
+    path: '/voice-enabled',
+    showForUseCases: ['Voice enabled Healthcare Price Transparency']
   }
 ];
 
 interface SidebarProps {
   selectedUseCase?: string;
+  loading?: boolean;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase }) => {
+const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase, loading }) => {
   const location = useLocation();
 
+  if (loading) {
+    return (
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+            top: headerHeight,
+            height: `calc(100% - ${headerHeight}px)`,
+            background: '#f7fafd',
+            borderRight: '1px solid #e3eafc',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }
+        }}
+      >
+        <Typography variant="body1" sx={{ mt: 4 }}>
+          Loading menu...
+        </Typography>
+      </Drawer>
+    );
+  }
+
   const filteredNavItems = navItems.filter(item => {
-    if (
-      item.text === 'Hospital Transparency' &&
-      selectedUseCase !== 'Healthcare Price Transparency'
-    ) {
-      return false;
-    }
-    return true;
+    if (!item.showForUseCases) return true;
+    return selectedUseCase && item.showForUseCases.includes(selectedUseCase);
   });
 
   return (
