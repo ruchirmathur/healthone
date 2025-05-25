@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Route, Routes, Outlet } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
@@ -13,11 +13,24 @@ import { useAuth0 } from '@auth0/auth0-react';
 import './App.css';
 
 function App() {
-  const { isLoading } = useAuth0();
+  const { isLoading, isAuthenticated, getIdTokenClaims } = useAuth0();
+  const [orgName, setOrgName] = useState('');
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      getIdTokenClaims().then(claims => setOrgName(
+        claims?.org_name || claims?.['https://yourdomain/org_name'] || ''
+      ));
+    }
+  }, [isAuthenticated, getIdTokenClaims]);
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
+  // You can use orgName anywhere in App component
+  // For demonstration, here's how to log it:
+  console.log('Organization Name:', orgName);
 
   return (
     <Routes>
