@@ -23,28 +23,39 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Combined loading state
+  const isLoading = authLoading || apiLoading;
+
   useEffect(() => {
-    if (isAuthenticated) {
-      setApiLoading(true);
-      getIdTokenClaims().then(claims => {
-        const org = claims?.org_name || claims?.['https://yourdomain/org_name'] || '';
-        const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
-        
-        fetch(`${apiHost}/retrieve/${encodeURIComponent(org)}`)
-          .then(response => response.json())
-          .then(data => {
-            setApiData(data);
-            setApiLoading(false);
-            
-            // Redirect to correct route after API load
-            const targetPath = getPathForUseCase(data.selectedUseCase);
-            if (location.pathname !== targetPath) {
-              navigate(targetPath, { replace: true });
-            }
-          });
-      });
+    if (isAuthenticated && !apiData) {
+      getIdTokenClaims()
+        .then(claims => {
+          const org = claims?.org_name || claims?.['https://yourdomain/org_name'] || '';
+          const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
+          
+          return fetch(`${apiHost}/data?org=${encodeURIComponent(org)}`)
+            .then(response => {
+              if (!response.ok) throw new Error('API failed');
+              return response.json();
+            })
+            .then(data => {
+              setApiData(data);
+              setApiLoading(false);
+              
+              // Redirect to correct route after API load
+              const targetPath = getPathForUseCase(data.selectedUseCase);
+              if (location.pathname !== targetPath) {
+                navigate(targetPath, { replace: true });
+              }
+            });
+        })
+        .catch(error => {
+          console.error('API Error:', error);
+          setApiLoading(false);
+          navigate('/404');
+        });
     }
-  }, [isAuthenticated, getIdTokenClaims, navigate, location.pathname]);
+  }, [isAuthenticated, apiData, navigate, location.pathname, getIdTokenClaims]);
 
   const getPathForUseCase = (useCase?: string) => {
     switch (useCase) {
@@ -61,27 +72,30 @@ function App() {
     }
   };
 
-  if (authLoading) {
-    return <div>Loading authentication...</div>;
+  if (isLoading) {
+    return (
+      <div className="full-page-loader">
+        <div className="loader-content">
+          <h2>Loading Application</h2>
+          <div className="spinner"></div>
+        </div>
+      </div>
+    );
   }
 
-  const ProtectedLayoutWrapper = () => (
+  const ProtectedLayout = () => (
     <div className="app-container">
       <Header />
       <Sidebar selectedUseCase={apiData?.selectedUseCase} />
       <div className="main-content">
-        {apiLoading ? (
-          <div>Loading application data...</div>
-        ) : (
-          <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/hospital" element={<HospitalPriceDashboard />} />
-            <Route path="/feedback" element={<UserFeedbackAnalytics />} />
-            <Route path="/memberdashboard" element={<MemberHealthCopilotDashboard />} />
-            <Route path="/voice-enabled" element={<div>Voice Enabled View</div>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        )}
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/hospital" element={<HospitalPriceDashboard />} />
+          <Route path="/feedback" element={<UserFeedbackAnalytics />} />
+          <Route path="/memberdashboard" element={<MemberHealthCopilotDashboard />} />
+          <Route path="/voice-enabled" element={<div>Voice Enabled View</div>} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </div>
     </div>
   );
@@ -90,8 +104,8 @@ function App() {
     <Routes>
       <Route path="/" element={<AutoLogin />} />
       <Route path="/callback" element={<div>Processing login...</div>} />
-      <Route element={<AuthenticationGuard component={ProtectedLayoutWrapper} />}>
-        <Route index element={<div />} /> {/* Empty element for nested routes */}
+      <Route element={<AuthenticationGuard component={ProtectedLayout} />}>
+        <Route index element={<div />} /> {/* Empty element for layout */}
       </Route>
       <Route path="/404" element={<NotFound />} />
       <Route path="*" element={<NotFound />} />
