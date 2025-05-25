@@ -59,7 +59,7 @@ function App() {
 
         setOrgName(orgNameFromClaims);
 
-        const apiHost = process.env.REACT_APP_API_HOST || '';
+        const apiHost = process.env.REACT_APP_API_BUILDER_HOST || '';
         const response = await fetch(
           `${apiHost}/retrieve/${encodeURIComponent(orgNameFromClaims)}`
         );
