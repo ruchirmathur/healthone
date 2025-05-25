@@ -43,19 +43,30 @@ const useCaseRoutes: Record<string, RouteConfig[]> = {
 function App() {
   const { isLoading: authLoading, isAuthenticated, getIdTokenClaims } = useAuth0();
   const [tenantConfig, setTenantConfig] = useState<TenantConfig | null>(null);
+  const [orgName, setOrgName] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchTenantConfig = async () => {
+    const fetchData = async () => {
       try {
         const claims = await getIdTokenClaims();
-        const orgId = claims?.org_id;
-        if (!orgId) throw new Error('Organization ID not found in claims');
+        const orgNameFromClaims = claims?.org_name;
+        
+        if (!orgNameFromClaims) {
+          throw new Error('Organization name not found in claims');
+        }
+
+        setOrgName(orgNameFromClaims);
 
         const apiHost = process.env.REACT_APP_API_HOST || '';
-        const response = await fetch(`${apiHost}/retrieve/${orgId}`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const response = await fetch(
+          `${apiHost}/retrieve/${encodeURIComponent(orgNameFromClaims)}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
         const data: TenantConfig = await response.json();
         setTenantConfig(data);
@@ -67,7 +78,9 @@ function App() {
       }
     };
 
-    if (isAuthenticated) fetchTenantConfig();
+    if (isAuthenticated) {
+      fetchData();
+    }
   }, [isAuthenticated, getIdTokenClaims]);
 
   if (authLoading || loading) return <div>Loading...</div>;
@@ -85,6 +98,7 @@ function App() {
           <ProtectedLayout 
             tenantConfig={tenantConfig}
             links={links}
+            orgName={orgName}
           />
         )} />
       }>
@@ -99,18 +113,20 @@ function App() {
   );
 }
 
-export default App;
-
-// ---------- ProtectedLayout.tsx (inline for clarity) ----------
 interface ProtectedLayoutProps {
   tenantConfig: TenantConfig | null;
   links: RouteConfig[];
+  orgName: string;
 }
 
-const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({ tenantConfig, links }) => (
+const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({ 
+  tenantConfig, 
+  links,
+  orgName 
+}) => (
   <div className="app-container">
     <Header 
-      orgName={tenantConfig?.appName || ''}
+      orgName={orgName || tenantConfig?.appName || ''}
       tenantId={tenantConfig?.TenantId || ''}
       color={tenantConfig?.color || '#2155CD'}
     />
@@ -120,3 +136,5 @@ const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({ tenantConfig, links }
     </div>
   </div>
 );
+
+export default App;
