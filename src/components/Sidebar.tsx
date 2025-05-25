@@ -20,43 +20,31 @@ import { Link, useLocation } from 'react-router-dom';
 const drawerWidth = 240;
 const headerHeight = 64;
 
-interface NavItem {
-  text: string;
-  icon: React.ReactNode;
-  path: string;
-  showForUseCases?: string[];
-}
-
-const navItems: NavItem[] = [
+const navItems = [
   {
-    text: 'Healthcare Underwriter Dashboard',
+    text: 'Underwriters Dashboard',
     icon: <DashboardIcon />,
-    path: '/dashboard',
-    showForUseCases: ['Healthcare Underwriter Dashboard']
+    path: '/dashboard'
   },
   {
-    text: 'User Feedback Analysis Dashboard',
+    text: 'User Feedback Analytics',
     icon: <InsightsIcon />,
-    path: '/feedback',
-    showForUseCases: ['User Feedback Analysis Dashboard']
+    path: '/feedback'
   },
   {
-    text: 'Healthcare Price Transparency',
+    text: 'Hospital Transparency',
     icon: <LocalHospitalIcon />,
-    path: '/hospital',
-    showForUseCases: ['Healthcare Price Transparency']
+    path: '/hospital'
   },
   {
     text: 'Member Dashboard',
     icon: <CardGiftcardIcon />,
-    path: '/memberdashboard',
-    showForUseCases: ['Member Dashboard']
+    path: '/memberdashboard'
   },
   {
-    text: 'Voice Enabled Healthcare Price Transparency',
+    text: 'Audio Accessible App',
     icon: <HearingIcon />,
-    path: '/voice-enabled',
-    showForUseCases: ['Voice enabled Healthcare Price Transparency']
+    path: '/audioaccessible'
   }
 ];
 
@@ -68,8 +56,13 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase }) => {
   const location = useLocation();
 
   const filteredNavItems = navItems.filter(item => {
-    if (!item.showForUseCases) return true;
-    return selectedUseCase && item.showForUseCases.includes(selectedUseCase);
+    if (
+      item.text === 'Hospital Transparency' &&
+      selectedUseCase !== 'Healthcare Price Transparency'
+    ) {
+      return false;
+    }
+    return true;
   });
 
   return (
