@@ -15,22 +15,40 @@ import './App.css';
 function App() {
   const { isLoading, isAuthenticated, getIdTokenClaims } = useAuth0();
   const [orgName, setOrgName] = useState('');
+  const [apiData, setApiData] = useState(null);
 
   useEffect(() => {
     if (isAuthenticated) {
-      getIdTokenClaims().then(claims => setOrgName(
-        claims?.org_name || claims?.['https://yourdomain/org_name'] || ''
-      ));
+      getIdTokenClaims().then(claims => {
+        const org = claims?.org_name || claims?.['https://yourdomain/org_name'] || '';
+        setOrgName(org);
+      });
     }
   }, [isAuthenticated, getIdTokenClaims]);
+
+  useEffect(() => {
+    if (orgName) {
+      const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
+      fetch(`${apiHost}/retrieve/${encodeURIComponent(orgName)}`)
+        .then(response => response.json())
+        .then(data => {
+          setApiData(data);
+          console.log('API Data:', data);
+        })
+        .catch(error => {
+          console.error('Error fetching API data:', error);
+        });
+    }
+  }, [orgName]);
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  // You can use orgName anywhere in App component
-  // For demonstration, here's how to log it:
+  // You can use orgName and apiData anywhere in App component
+  // For demonstration, here's how to log them:
   console.log('Organization Name:', orgName);
+  console.log('API Data:', apiData);
 
   return (
     <Routes>
