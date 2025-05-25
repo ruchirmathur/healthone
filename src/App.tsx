@@ -29,7 +29,7 @@ function App() {
   useEffect(() => {
     if (orgName) {
       const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
-      fetch(`${apiHost}/retrieve/${encodeURIComponent(orgName)}`)
+      fetch(`${apiHost}/data?org=${encodeURIComponent(orgName)}`)
         .then(response => response.json())
         .then(data => {
           setApiData(data);
@@ -45,16 +45,11 @@ function App() {
     return <div>Loading...</div>;
   }
 
-  // You can use orgName and apiData anywhere in App component
-  // For demonstration, here's how to log them:
-  console.log('Organization Name:', orgName);
-  console.log('API Data:', apiData);
-
   return (
     <Routes>
       <Route path="/" element={<AutoLogin />} />
       <Route path="/callback" element={<div>Processing login...</div>} />
-      <Route element={<AuthenticationGuard component={ProtectedLayout} />}>
+      <Route element={<AuthenticationGuard component={() => <ProtectedLayout selectedUseCase={apiData?.selectedUseCase} />} />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/hospital" element={<HospitalPriceDashboard />} />
         <Route path="/feedback" element={<UserFeedbackAnalytics />} />
@@ -66,10 +61,10 @@ function App() {
   );
 }
 
-const ProtectedLayout = () => (
+const ProtectedLayout = ({ selectedUseCase }) => (
   <div className="app-container">
     <Header />
-    <Sidebar />
+    <Sidebar selectedUseCase={selectedUseCase} />
     <div className="main-content">
       <Outlet />
     </div>
