@@ -1,3 +1,4 @@
+// Sidebar.tsx
 import React from 'react';
 import {
   Drawer,
@@ -24,7 +25,7 @@ interface NavItem {
   text: string;
   icon: React.ReactNode;
   path: string;
-  showForUseCases?: string[];
+  useCase: string; // Exact use case match required
 }
 
 const navItems: NavItem[] = [
@@ -32,31 +33,31 @@ const navItems: NavItem[] = [
     text: 'Healthcare Underwriter Dashboard',
     icon: <DashboardIcon />,
     path: '/dashboard',
-    showForUseCases: ['Healthcare Underwriter Dashboard']
+    useCase: 'Healthcare Underwriter Dashboard'
   },
   {
     text: 'User Feedback Analysis Dashboard',
     icon: <InsightsIcon />,
     path: '/feedback',
-    showForUseCases: ['User Feedback Analysis Dashboard']
+    useCase: 'User Feedback Analysis Dashboard'
   },
   {
     text: 'Healthcare Price Transparency',
     icon: <LocalHospitalIcon />,
     path: '/hospital',
-    showForUseCases: ['Healthcare Price Transparency']
+    useCase: 'Healthcare Price Transparency'
   },
   {
     text: 'Member Dashboard',
     icon: <CardGiftcardIcon />,
     path: '/memberdashboard',
-    showForUseCases: ['Member Dashboard']
+    useCase: 'Member Dashboard'
   },
   {
     text: 'Voice Enabled Healthcare Price Transparency',
     icon: <HearingIcon />,
     path: '/voice-enabled',
-    showForUseCases: ['Voice enabled Healthcare Price Transparency']
+    useCase: 'Voice enabled Healthcare Price Transparency'
   }
 ];
 
@@ -89,17 +90,13 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase, loading }) => {
           }
         }}
       >
-        <Typography variant="body1" sx={{ mt: 4 }}>
-          Loading menu...
-        </Typography>
+        <Typography variant="body1">Loading menu...</Typography>
       </Drawer>
     );
   }
 
-  const filteredNavItems = navItems.filter(item => {
-    if (!item.showForUseCases) return true;
-    return selectedUseCase && item.showForUseCases.includes(selectedUseCase);
-  });
+  const activeItem = navItems.find(item => item.useCase === selectedUseCase);
+  console.log('Active sidebar item:', activeItem);
 
   return (
     <Drawer
@@ -128,31 +125,31 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase, loading }) => {
       <Divider sx={{ mb: 1 }} />
       <Box sx={{ flex: 1, overflow: 'auto' }}>
         <List>
-          {filteredNavItems.map(({ text, icon, path }) => (
+          {activeItem && (
             <ListItemButton
-              key={text}
+              key={activeItem.text}
               component={Link}
-              to={path}
-              selected={location.pathname === path}
+              to={activeItem.path}
+              selected={location.pathname === activeItem.path}
               sx={{
                 borderRadius: 2,
                 mx: 1,
                 my: 0.5,
-                color: location.pathname === path ? '#2155CD' : '#1a237e',
-                background: location.pathname === path ? '#e3eafc' : 'transparent',
-                fontWeight: location.pathname === path ? 700 : 400,
+                color: location.pathname === activeItem.path ? '#2155CD' : '#1a237e',
+                background: location.pathname === activeItem.path ? '#e3eafc' : 'transparent',
+                fontWeight: location.pathname === activeItem.path ? 700 : 400,
                 '&:hover': {
                   background: '#e3eafc',
                   color: '#2155CD'
                 }
               }}
             >
-              <ListItemIcon sx={{ color: location.pathname === path ? '#2155CD' : '#1a237e', minWidth: 40 }}>
-                {icon}
+              <ListItemIcon sx={{ color: location.pathname === activeItem.path ? '#2155CD' : '#1a237e', minWidth: 40 }}>
+                {activeItem.icon}
               </ListItemIcon>
-              <ListItemText primary={text} />
+              <ListItemText primary={activeItem.text} />
             </ListItemButton>
-          ))}
+          )}
         </List>
       </Box>
       <Box sx={{ p: 2, borderTop: '1px solid #e3eafc', textAlign: 'center' }}>
