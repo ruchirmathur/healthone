@@ -29,7 +29,7 @@ function App() {
   useEffect(() => {
     if (orgName) {
       const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
-      fetch(`${apiHost}/data?org=${encodeURIComponent(orgName)}`)
+      fetch(`${apiHost}/retrieve/${encodeURIComponent(orgName)}`)
         .then(response => response.json())
         .then(data => {
           setApiData(data);
