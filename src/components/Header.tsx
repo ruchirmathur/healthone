@@ -3,31 +3,28 @@ import { AppBar, Toolbar, Typography, IconButton, Box, Menu, MenuItem, Avatar, T
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { useAuth0 } from "@auth0/auth0-react";
 
-const namespace = 'https://myapp.example.com';
+interface HeaderProps {
+  orgName: string;
+  tenantId: string;
+  color: string;
+}
 
-const Header = () => {
+const Header: React.FC<HeaderProps> = ({ orgName, tenantId, color }) => {
   const { user, logout, isAuthenticated, isLoading } = useAuth0();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
+  const handleClose = () => setAnchorEl(null);
   const handleLogout = () => {
     logout({ logoutParams: { returnTo: window.location.origin } });
     handleClose();
   };
 
-  const userMetadata = user?.[`${namespace}/user_metadata`];
-  const tenantId = userMetadata?.tenantid;
-
   return (
     <AppBar
       position="fixed"
       sx={{
-        background: "#2155CD",
+        background: color,
         color: "#fff",
         zIndex: (theme) => theme.zIndex.drawer + 1,
         height: 64,
@@ -46,7 +43,7 @@ const Header = () => {
             textAlign: "center"
           }}
         >
-          HealthOne Platform
+          {orgName || "HealthOne Platform"}
         </Typography>
         {!isLoading && isAuthenticated && (
           <Box display="flex" alignItems="center" gap={1}>
