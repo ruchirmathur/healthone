@@ -20,24 +20,35 @@ import { Link, useLocation } from 'react-router-dom';
 const drawerWidth = 240;
 const headerHeight = 64;
 
-const iconMap: Record<string, React.ReactNode> = {
-  '/dashboard': <DashboardIcon />,
-  '/feedback': <InsightsIcon />,
-  '/hospital': <LocalHospitalIcon />,
-  '/memberdashboard': <CardGiftcardIcon />,
-  '/audioaccessible': <HearingIcon />
-};
+const navItems = [
+  {
+    text: 'Underwriters Dashboard',
+    icon: <DashboardIcon />,
+    path: '/dashboard'
+  },
+  {
+    text: 'User Feedback Analytics',
+    icon: <InsightsIcon />,
+    path: '/feedback'
+  },
+  {
+    text: 'Hospital Transparency',
+    icon: <LocalHospitalIcon />,
+    path: '/hospital'
+  },
+  {
+    text: 'Member Dashboard',
+    icon: <CardGiftcardIcon />,
+    path: '/memberdashboard'
+  },
+  {
+    text: 'Audio Accessible App',
+    icon: <HearingIcon />,
+    path: '/audioaccessible'
+  }
+];
 
-interface RouteConfig {
-  path: string;
-  label: string;
-}
-
-interface SidebarProps {
-  links: RouteConfig[];
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ links }) => {
+const Sidebar: React.FC = () => {
   const location = useLocation();
 
   return (
@@ -67,9 +78,9 @@ const Sidebar: React.FC<SidebarProps> = ({ links }) => {
       <Divider sx={{ mb: 1 }} />
       <Box sx={{ flex: 1, overflow: 'auto' }}>
         <List>
-          {links.map(({ label, path }) => (
+          {navItems.map(({ text, icon, path }) => (
             <ListItemButton
-              key={path}
+              key={text}
               component={Link}
               to={path}
               selected={location.pathname === path}
@@ -87,9 +98,9 @@ const Sidebar: React.FC<SidebarProps> = ({ links }) => {
               }}
             >
               <ListItemIcon sx={{ color: location.pathname === path ? '#2155CD' : '#1a237e', minWidth: 40 }}>
-                {iconMap[path] || <DashboardIcon />}
+                {icon}
               </ListItemIcon>
-              <ListItemText primary={label} />
+              <ListItemText primary={text} />
             </ListItemButton>
           ))}
         </List>
