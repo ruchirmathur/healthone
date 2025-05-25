@@ -1,4 +1,3 @@
-// Sidebar.tsx
 import React from 'react';
 import {
   Drawer,
@@ -25,7 +24,7 @@ interface NavItem {
   text: string;
   icon: React.ReactNode;
   path: string;
-  useCase: string; // Exact use case match required
+  useCase: string;
 }
 
 const navItems: NavItem[] = [
@@ -63,40 +62,14 @@ const navItems: NavItem[] = [
 
 interface SidebarProps {
   selectedUseCase?: string;
-  loading?: boolean;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase, loading }) => {
+const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase }) => {
   const location = useLocation();
 
-  if (loading) {
-    return (
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
-            width: drawerWidth,
-            boxSizing: 'border-box',
-            top: headerHeight,
-            height: `calc(100% - ${headerHeight}px)`,
-            background: '#f7fafd',
-            borderRight: '1px solid #e3eafc',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }
-        }}
-      >
-        <Typography variant="body1">Loading menu...</Typography>
-      </Drawer>
-    );
-  }
-
-  const activeItem = navItems.find(item => item.useCase === selectedUseCase);
-  console.log('Active sidebar item:', activeItem);
+  const filteredNavItems = navItems.filter(item => 
+    item.useCase === selectedUseCase
+  );
 
   return (
     <Drawer
@@ -125,31 +98,31 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase, loading }) => {
       <Divider sx={{ mb: 1 }} />
       <Box sx={{ flex: 1, overflow: 'auto' }}>
         <List>
-          {activeItem && (
+          {filteredNavItems.map(({ text, icon, path }) => (
             <ListItemButton
-              key={activeItem.text}
+              key={text}
               component={Link}
-              to={activeItem.path}
-              selected={location.pathname === activeItem.path}
+              to={path}
+              selected={location.pathname === path}
               sx={{
                 borderRadius: 2,
                 mx: 1,
                 my: 0.5,
-                color: location.pathname === activeItem.path ? '#2155CD' : '#1a237e',
-                background: location.pathname === activeItem.path ? '#e3eafc' : 'transparent',
-                fontWeight: location.pathname === activeItem.path ? 700 : 400,
+                color: location.pathname === path ? '#2155CD' : '#1a237e',
+                background: location.pathname === path ? '#e3eafc' : 'transparent',
+                fontWeight: location.pathname === path ? 700 : 400,
                 '&:hover': {
                   background: '#e3eafc',
                   color: '#2155CD'
                 }
               }}
             >
-              <ListItemIcon sx={{ color: location.pathname === activeItem.path ? '#2155CD' : '#1a237e', minWidth: 40 }}>
-                {activeItem.icon}
+              <ListItemIcon sx={{ color: location.pathname === path ? '#2155CD' : '#1a237e', minWidth: 40 }}>
+                {icon}
               </ListItemIcon>
-              <ListItemText primary={activeItem.text} />
+              <ListItemText primary={text} />
             </ListItemButton>
-          )}
+          ))}
         </List>
       </Box>
       <Box sx={{ p: 2, borderTop: '1px solid #e3eafc', textAlign: 'center' }}>
