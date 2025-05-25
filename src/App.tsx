@@ -50,8 +50,8 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const claims = await getIdTokenClaims();
-        const orgNameFromClaims = claims?.org_name;
+       
+        const orgNameFromClaims = "tester8";
         console.log(orgNameFromClaims);
         console.log(process.env.REACT_APP_API_BUILDER_HOST);
         
