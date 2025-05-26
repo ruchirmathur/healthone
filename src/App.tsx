@@ -17,9 +17,10 @@ interface ApiData {
 }
 
 function App() {
-  const { isAuthenticated, getIdTokenClaims } = useAuth0();
+  const { isLoading: authLoading, isAuthenticated, getIdTokenClaims } = useAuth0();
   const [orgName, setOrgName] = useState('');
   const [apiData, setApiData] = useState<ApiData | null>(null);
+  const [apiLoading, setApiLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,7 +32,7 @@ function App() {
         })
         .catch(error => {
           console.error('Auth0 claims error:', error);
-          navigate('/error'); // Add error route
+          navigate('/error');
         });
     }
   }, [isAuthenticated, getIdTokenClaims, navigate]);
@@ -39,21 +40,25 @@ function App() {
   useEffect(() => {
     if (orgName) {
       const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
-    
-      fetch(`${apiHost}/retrieve/${encodeURIComponent(orgName)}`)
-        .then(response => {
-          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-          return response.json();
-        })
-        .then((data: ApiData) => {
-          setApiData(data);
-       
-        })
-        .catch(error => {
-          console.error('API Error:', error);
-          setApiData({ selectedUseCase: [] });
-         
-        });
+      setApiLoading(true);
+      
+      // Add artificial delay for demonstration
+      setTimeout(() => {
+        fetch(`${apiHost}/retrieve/${encodeURIComponent(orgName)}`)
+          .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json();
+          })
+          .then((data: ApiData) => {
+            setApiData(data);
+            setApiLoading(false);
+          })
+          .catch(error => {
+            console.error('API Error:', error);
+            setApiData({ selectedUseCase: [] });
+            setApiLoading(false);
+          });
+      }, 1000); // 1 second delay
     }
   }, [orgName]);
 
@@ -73,13 +78,24 @@ function App() {
         : []
     : [];
 
+
+  const ProtectedLayout = () => (
+    <div style={{ display: 'flex' }}>
+      <Header />
+      <Sidebar selectedUseCase={selectedUseCase} />
+      <div style={{ flexGrow: 1, padding: '24px', marginLeft: 240 }}>
+        <Outlet />
+      </div>
+    </div>
+  );
+
   return (
     <Routes>
-      <Route path="/" element={<AutoLogin />} />
+      <Route path="/autologin" element={<AutoLogin />} />
       <Route path="/callback" element={<div>Processing login...</div>} />
       
       <Route element={<AuthenticationGuard component={ProtectedLayout} />}>
-        <Route path="/" element={<Dashboard />} />
+        <Route index element={<Dashboard />} />
         {selectedUseCase.includes('Healthcare Underwriter Dashboard') && (
           <Route path="/dashboard" element={<Dashboard />} />
         )}
@@ -99,15 +115,5 @@ function App() {
     </Routes>
   );
 }
-
-const ProtectedLayout = () => (
-  <div style={{ display: 'flex' }}>
-    <Header />
-    <Sidebar selectedUseCase={[]} /> {/* Update this after fixing Sidebar */}
-    <div style={{ flexGrow: 1, padding: '24px', marginLeft: 240 }}>
-      <Outlet />
-    </div>
-  </div>
-);
 
 export default App;
