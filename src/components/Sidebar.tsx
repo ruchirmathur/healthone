@@ -27,25 +27,25 @@ const navItems = [
   { 
     key: 'Healthcare Underwriter Dashboard',
     text: 'Underwriters Dashboard', 
-    icon: <DashboardIcon />, 
+    icon: <DashboardIcon />,
     path: '/dashboard'
   },
   { 
     key: 'User Feedback Analysis Dashboard',
     text: 'User Feedback Analytics', 
-    icon: <HearingIcon />, 
+    icon: <HearingIcon />,
     path: '/feedback'
   },
   { 
     key: 'Healthcare Price Transparency',
     text: 'Hospital Transparency', 
-    icon: <LocalHospitalIcon />, 
+    icon: <LocalHospitalIcon />,
     path: '/hospital'
   },
   { 
     key: 'Member Dashboard',
     text: 'Member Dashboard', 
-    icon: <CardGiftcardIcon />, 
+    icon: <CardGiftcardIcon />,
     path: '/memberdashboard'
   }
 ];
