@@ -40,23 +40,38 @@ const Header: React.FC<HeaderProps> = ({ orgName, headerColor }) => {
         boxShadow: "0 2px 8px rgba(33,85,205,0.08)"
       }}
     >
-      <Toolbar sx={{ minHeight: 64, display: "flex", justifyContent: "space-between" }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 700,
-              letterSpacing: 1,
-              fontFamily: "Montserrat, Roboto, sans-serif",
-              flex: 1,
-              textAlign: "left"
-            }}
-          >
-            {orgName || "HealthOne Platform"}
-          </Typography>
-        </Box>
+      <Toolbar
+        sx={{
+          minHeight: 64,
+          position: "relative",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}
+      >
+        {/* Centered Heading */}
+        <Typography
+          variant="h6"
+          sx={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            margin: "auto",
+            width: "fit-content",
+            fontWeight: 700,
+            letterSpacing: 1,
+            fontFamily: "Montserrat, Roboto, sans-serif",
+            textAlign: "center",
+            pointerEvents: "none", // Allows clicks to pass through to user menu
+            userSelect: "none"
+          }}
+        >
+          {orgName || "HealthOne Platform"}
+        </Typography>
+
+        {/* Right user/account section */}
         {!isLoading && isAuthenticated && (
-          <Box display="flex" alignItems="center" gap={1}>
+          <Box display="flex" alignItems="center" gap={1} ml="auto">
             {tenantId && (
               <Typography variant="body2" sx={{ color: "#e3eafc", fontWeight: 500, mr: 1 }}>
                 {tenantId}
