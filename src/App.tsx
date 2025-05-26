@@ -13,7 +13,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import './App.css';
 
 interface ApiData {
-  selectedUseCase?: string[];
+  selectedUseCase?: string | string[];
 }
 
 function App() {
@@ -34,30 +34,37 @@ function App() {
     if (orgName) {
       const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
       fetch(`${apiHost}/retrieve/${encodeURIComponent(orgName)}`)
-        .then(response => response.json())
-        .then((data: ApiData) => {
-          setApiData(data);
+        .then(response => {
+          if (!response.ok) throw new Error('API request failed');
+          return response.json();
         })
+        .then((data: ApiData) => setApiData(data))
         .catch(error => {
           console.error('Error fetching API data:', error);
+          setApiData({ selectedUseCase: [] });
         });
     }
   }, [orgName]);
 
-  if (isLoading || !apiData) {
-    return <div>Loading...</div>;
-  }
-
   const allowedUseCases = [
-    'Healthcare Price Transparency',
-    'User Feedback Analysis Dashboard',
     'Healthcare Underwriter Dashboard',
+    'User Feedback Analysis Dashboard',
+    'Healthcare Price Transparency',
     'Member Dashboard'
   ];
 
-  const selectedUseCase = Array.isArray(apiData?.selectedUseCase)
-    ? apiData.selectedUseCase.filter(uc => allowedUseCases.includes(uc))
+  // Handle both string and array responses
+  const selectedUseCase = apiData?.selectedUseCase
+    ? Array.isArray(apiData.selectedUseCase)
+      ? apiData.selectedUseCase.filter(uc => allowedUseCases.includes(uc))
+      : allowedUseCases.includes(apiData.selectedUseCase)
+        ? [apiData.selectedUseCase]
+        : []
     : [];
+
+  if (isLoading || !apiData) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div style={{ display: 'flex' }}>
