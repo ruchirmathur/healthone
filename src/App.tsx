@@ -39,7 +39,7 @@ function App() {
   useEffect(() => {
     if (orgName) {
       const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
-      setApiLoading(true);
+    
       fetch(`${apiHost}/retrieve/${encodeURIComponent(orgName)}`)
         .then(response => {
           if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -47,12 +47,12 @@ function App() {
         })
         .then((data: ApiData) => {
           setApiData(data);
-          setApiLoading(false);
+       
         })
         .catch(error => {
           console.error('API Error:', error);
           setApiData({ selectedUseCase: [] });
-          setApiLoading(false);
+         
         });
     }
   }, [orgName]);
