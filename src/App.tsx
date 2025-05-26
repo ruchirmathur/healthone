@@ -39,7 +39,6 @@ function App() {
   useEffect(() => {
     if (orgName) {
       const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
-      setApiLoading(true);
       
       // Add artificial delay for demonstration
       setTimeout(() => {
@@ -50,12 +49,11 @@ function App() {
           })
           .then((data: ApiData) => {
             setApiData(data);
-            setApiLoading(false);
+            
           })
           .catch(error => {
             console.error('API Error:', error);
             setApiData({ selectedUseCase: [] });
-            setApiLoading(false);
           });
       }, 2000); // 1 second delay
     }
