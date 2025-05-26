@@ -5,7 +5,12 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 const namespace = 'https://myapp.example.com';
 
-const Header = () => {
+interface HeaderProps {
+  orgName: string;
+  headerColor: string;
+}
+
+const Header: React.FC<HeaderProps> = ({ orgName, headerColor }) => {
   const { user, logout, isAuthenticated, isLoading } = useAuth0();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -27,7 +32,7 @@ const Header = () => {
     <AppBar
       position="fixed"
       sx={{
-        background: "#2155CD",
+        background: headerColor,
         color: "#fff",
         zIndex: (theme) => theme.zIndex.drawer + 1,
         height: 64,
@@ -36,18 +41,20 @@ const Header = () => {
       }}
     >
       <Toolbar sx={{ minHeight: 64, display: "flex", justifyContent: "space-between" }}>
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 700,
-            letterSpacing: 1,
-            fontFamily: "Montserrat, Roboto, sans-serif",
-            flex: 1,
-            textAlign: "center"
-          }}
-        >
-          HealthOne Platform
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 700,
+              letterSpacing: 1,
+              fontFamily: "Montserrat, Roboto, sans-serif",
+              flex: 1,
+              textAlign: "left"
+            }}
+          >
+            {orgName || "HealthOne Platform"}
+          </Typography>
+        </Box>
         {!isLoading && isAuthenticated && (
           <Box display="flex" alignItems="center" gap={1}>
             {tenantId && (
