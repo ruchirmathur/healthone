@@ -17,9 +17,10 @@ interface ApiData {
 }
 
 function App() {
-  const { isAuthenticated, getIdTokenClaims } = useAuth0();
+  const { isLoading: authLoading, isAuthenticated, getIdTokenClaims } = useAuth0();
   const [orgName, setOrgName] = useState('');
   const [apiData, setApiData] = useState<ApiData | null>(null);
+  const [apiLoading, setApiLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,8 +40,9 @@ function App() {
   useEffect(() => {
     if (orgName) {
       const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
-      
-      // Add artificial delay for demonstration
+      setApiLoading(true);
+
+      // Artificial delay for smoother UX
       setTimeout(() => {
         fetch(`${apiHost}/retrieve/${encodeURIComponent(orgName)}`)
           .then(response => {
@@ -49,13 +51,14 @@ function App() {
           })
           .then((data: ApiData) => {
             setApiData(data);
-            
+            setApiLoading(false);
           })
           .catch(error => {
             console.error('API Error:', error);
             setApiData({ selectedUseCase: [] });
+            setApiLoading(false);
           });
-      }, 2000); // 1 second delay
+      }, 1000); // 1 second delay
     }
   }, [orgName]);
 
@@ -75,7 +78,11 @@ function App() {
         : []
     : [];
 
+  if (authLoading || apiLoading) {
+    return <div className="loading-screen">Loading application configuration...</div>;
+  }
 
+  // Layout for protected routes
   const ProtectedLayout = () => (
     <div style={{ display: 'flex' }}>
       <Header />
@@ -92,7 +99,7 @@ function App() {
       <Route path="/callback" element={<div>Processing login...</div>} />
       
       <Route element={<AuthenticationGuard component={ProtectedLayout} />}>
-        <Route index element={<Dashboard />} />
+        {/* Only load Dashboard for "/" */}
         {selectedUseCase.includes('Healthcare Underwriter Dashboard') && (
           <Route path="/dashboard" element={<Dashboard />} />
         )}
@@ -105,6 +112,8 @@ function App() {
         {selectedUseCase.includes('Member Dashboard') && (
           <Route path="/memberdashboard" element={<MemberHealthCopilotDashboard />} />
         )}
+        {/* Optionally, redirect "/" to the first allowed use case */}
+        <Route path="/" element={<DefaultLanding selectedUseCase={selectedUseCase} />} />
       </Route>
       
       <Route path="/404" element={<NotFound />} />
@@ -112,5 +121,24 @@ function App() {
     </Routes>
   );
 }
+
+// Redirect "/" to the first allowed use case route
+const DefaultLanding: React.FC<{ selectedUseCase: string[] }> = ({ selectedUseCase }) => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (selectedUseCase.includes('Healthcare Underwriter Dashboard')) {
+      navigate('/dashboard', { replace: true });
+    } else if (selectedUseCase.includes('Healthcare Price Transparency')) {
+      navigate('/hospital', { replace: true });
+    } else if (selectedUseCase.includes('User Feedback Analysis Dashboard')) {
+      navigate('/feedback', { replace: true });
+    } else if (selectedUseCase.includes('Member Dashboard')) {
+      navigate('/memberdashboard', { replace: true });
+    }
+  }, [selectedUseCase, navigate]);
+
+  return <div>Redirecting...</div>;
+};
 
 export default App;
