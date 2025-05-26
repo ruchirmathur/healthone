@@ -14,10 +14,12 @@ import './App.css';
 
 interface ApiData {
   selectedUseCase?: string | string[];
+  color?: string;
+  appName?: string;
 }
 
 function App() {
-  const {isAuthenticated, getIdTokenClaims } = useAuth0();
+  const { isAuthenticated, getIdTokenClaims } = useAuth0();
   const [orgName, setOrgName] = useState('');
   const [apiData, setApiData] = useState<ApiData | null>(null);
   const [apiLoading, setApiLoading] = useState(false);
@@ -42,7 +44,6 @@ function App() {
       const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
       setApiLoading(true);
 
-      // Artificial delay for demonstration
       setTimeout(() => {
         fetch(`${apiHost}/retrieve/${encodeURIComponent(orgName)}`)
           .then(response => {
@@ -78,6 +79,10 @@ function App() {
         : []
     : [];
 
+  // Use org display name and color from API if available
+  const orgDisplayName = apiData?.appName || orgName || "HealthOne Platform";
+  const headerColor = apiData?.color || "#2155CD";
+
   // Show loading spinner while API is processing
   if (apiLoading) {
     return (
@@ -91,7 +96,7 @@ function App() {
   // Layout for protected routes
   const ProtectedLayout = () => (
     <div className="app-container">
-      <Header />
+      <Header orgName={orgDisplayName} headerColor={headerColor} />
       <div className="app-body">
         <Sidebar selectedUseCase={selectedUseCase} />
         <main className="main-content">
