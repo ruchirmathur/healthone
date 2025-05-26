@@ -20,7 +20,6 @@ function App() {
   const { isLoading: authLoading, isAuthenticated, getIdTokenClaims } = useAuth0();
   const [orgName, setOrgName] = useState('');
   const [apiData, setApiData] = useState<ApiData | null>(null);
-  const [apiLoading, setApiLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,7 +57,7 @@ function App() {
             setApiData({ selectedUseCase: [] });
             setApiLoading(false);
           });
-      }, 1000); // 1 second delay
+      }, 2000); // 1 second delay
     }
   }, [orgName]);
 
