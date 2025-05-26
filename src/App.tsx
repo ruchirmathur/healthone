@@ -15,7 +15,7 @@ import './App.css';
 function App() {
   const { isLoading, isAuthenticated, getIdTokenClaims } = useAuth0();
   const [orgName, setOrgName] = useState('');
-  const [apiData, setApiData] = useState<any>(null);
+  const [apiData, setApiData] = useState(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -44,7 +44,7 @@ function App() {
     }
   }, [orgName]);
 
-  if (isLoading || !apiData) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
@@ -57,10 +57,9 @@ function App() {
   ];
 
   // Only include allowed use cases that are present in the API response
-  const selectedUseCase: string[] =
-    apiData.selectedUseCase?.filter((uc: string) =>
-      allowedUseCases.includes(uc)
-    ) || [];
+  const selectedUseCase: string[] = Array.isArray(apiData?.selectedUseCase)
+    ? apiData.selectedUseCase.filter((uc: string) => allowedUseCases.includes(uc))
+    : [];
 
   return (
     <div style={{ display: 'flex' }}>
@@ -68,37 +67,31 @@ function App() {
       <Sidebar selectedUseCase={selectedUseCase} />
       <main style={{ flexGrow: 1, padding: '24px', marginLeft: 240 }}>
         <Routes>
-          {/* Underwriters Dashboard */}
           {selectedUseCase.includes('Healthcare Underwriter Dashboard') && (
             <Route
               path="/dashboard"
               element={<AuthenticationGuard component={Dashboard} />}
             />
           )}
-          {/* User Feedback Analytics */}
           {selectedUseCase.includes('User Feedback Analysis Dashboard') && (
             <Route
               path="/feedback"
               element={<AuthenticationGuard component={UserFeedbackAnalytics} />}
             />
           )}
-          {/* Hospital Transparency */}
           {selectedUseCase.includes('Healthcare Price Transparency') && (
             <Route
               path="/hospital"
               element={<AuthenticationGuard component={HospitalPriceDashboard} />}
             />
           )}
-          {/* Member Dashboard */}
           {selectedUseCase.includes('Member Dashboard') && (
             <Route
               path="/memberdashboard"
               element={<AuthenticationGuard component={MemberHealthCopilotDashboard} />}
             />
           )}
-          {/* AutoLogin route */}
           <Route path="/autologin" element={<AutoLogin />} />
-          {/* Fallback */}
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Outlet />
