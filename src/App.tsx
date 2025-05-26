@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Route, Routes, Outlet } from 'react-router-dom';
+import { Route, Routes, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
@@ -17,48 +17,55 @@ interface ApiData {
 }
 
 function App() {
-  const { isLoading, isAuthenticated, getIdTokenClaims } = useAuth0();
+  const { isLoading: authLoading, isAuthenticated, getIdTokenClaims } = useAuth0();
   const [orgName, setOrgName] = useState('');
   const [apiData, setApiData] = useState<ApiData | null>(null);
-  const [apiError, setApiError] = useState('');
+  const [apiLoading, setApiLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated) {
-      getIdTokenClaims().then(claims => {
-        const org = claims?.org_name || claims?.['https://yourdomain/org_name'] || '';
-        setOrgName(org);
-      });
+      getIdTokenClaims()
+        .then(claims => {
+          const org = claims?.org_name || claims?.['https://yourdomain/org_name'] || '';
+          setOrgName(org);
+        })
+        .catch(error => {
+          console.error('Auth0 claims error:', error);
+          navigate('/error'); // Add error route
+        });
     }
-  }, [isAuthenticated, getIdTokenClaims]);
+  }, [isAuthenticated, getIdTokenClaims, navigate]);
 
   useEffect(() => {
     if (orgName) {
       const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
+      setApiLoading(true);
       fetch(`${apiHost}/retrieve/${encodeURIComponent(orgName)}`)
         .then(response => {
-          if (!response.ok) throw new Error('API request failed');
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
           return response.json();
         })
         .then((data: ApiData) => {
           setApiData(data);
-          setApiError('');
+          setApiLoading(false);
         })
         .catch(error => {
           console.error('API Error:', error);
-          setApiError('Failed to load configuration');
           setApiData({ selectedUseCase: [] });
+          setApiLoading(false);
         });
     }
   }, [orgName]);
 
+  // Normalize selectedUseCase to array
   const allowedUseCases = [
-    'Healthcare Underwriter Dashboard', 
+    'Healthcare Underwriter Dashboard',
     'User Feedback Analysis Dashboard',
     'Healthcare Price Transparency',
     'Member Dashboard'
   ];
 
-  // Handle both string and array responses
   const selectedUseCase = apiData?.selectedUseCase
     ? Array.isArray(apiData.selectedUseCase)
       ? apiData.selectedUseCase.filter(uc => allowedUseCases.includes(uc))
@@ -67,36 +74,45 @@ function App() {
         : []
     : [];
 
-  if (isLoading || (!apiData && !apiError)) {
-    return <div className="loading">Loading application...</div>;
+  if (authLoading || apiLoading) {
+    return <div>Loading application...</div>;
   }
 
   return (
-    <div style={{ display: 'flex' }}>
-      <Header />
-      <Sidebar selectedUseCase={selectedUseCase} />
-      <main style={{ flexGrow: 1, padding: '24px', marginLeft: 240 }}>
-        {apiError && <div className="error-banner">{apiError}</div>}
-        <Routes>
-          {selectedUseCase.includes('Healthcare Underwriter Dashboard') && (
-            <Route path="/dashboard" element={<AuthenticationGuard component={Dashboard} />} />
-          )}
-          {selectedUseCase.includes('User Feedback Analysis Dashboard') && (
-            <Route path="/feedback" element={<AuthenticationGuard component={UserFeedbackAnalytics} />} />
-          )}
-          {selectedUseCase.includes('Healthcare Price Transparency') && (
-            <Route path="/hospital" element={<AuthenticationGuard component={HospitalPriceDashboard} />} />
-          )}
-          {selectedUseCase.includes('Member Dashboard') && (
-            <Route path="/memberdashboard" element={<AuthenticationGuard component={MemberHealthCopilotDashboard} />} />
-          )}
-          <Route path="/autologin" element={<AutoLogin />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Outlet />
-      </main>
-    </div>
+    <Routes>
+      <Route path="/" element={<AutoLogin />} />
+      <Route path="/callback" element={<div>Processing login...</div>} />
+      
+      <Route element={<AuthenticationGuard component={ProtectedLayout} />}>
+        <Route path="/" element={<Dashboard />} />
+        {selectedUseCase.includes('Healthcare Underwriter Dashboard') && (
+          <Route path="/dashboard" element={<Dashboard />} />
+        )}
+        {selectedUseCase.includes('Healthcare Price Transparency') && (
+          <Route path="/hospital" element={<HospitalPriceDashboard />} />
+        )}
+        {selectedUseCase.includes('User Feedback Analysis Dashboard') && (
+          <Route path="/feedback" element={<UserFeedbackAnalytics />} />
+        )}
+        {selectedUseCase.includes('Member Dashboard') && (
+          <Route path="/memberdashboard" element={<MemberHealthCopilotDashboard />} />
+        )}
+      </Route>
+      
+      <Route path="/404" element={<NotFound />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
+
+const ProtectedLayout = () => (
+  <div style={{ display: 'flex' }}>
+    <Header />
+    <Sidebar selectedUseCase={[]} /> {/* Update this after fixing Sidebar */}
+    <div style={{ flexGrow: 1, padding: '24px', marginLeft: 240 }}>
+      <Outlet />
+    </div>
+  </div>
+);
 
 export default App;
