@@ -90,3 +90,38 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+.custom-loading-bg {
+  background: #fff;
+  height: 100vh;
+  width: 100vw;
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.custom-spinner {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #2155CD;
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  animation: custom-spin 1s linear infinite;
+  margin-bottom: 24px;
+}
+
+@keyframes custom-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.custom-loading-text {
+  color: #2155CD;
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-top: 8px;
+  letter-spacing: 0.5px;
+}
