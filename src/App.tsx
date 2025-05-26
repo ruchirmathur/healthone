@@ -15,12 +15,15 @@ import './App.css';
 function App() {
   const { isLoading, isAuthenticated, getIdTokenClaims } = useAuth0();
   const [orgName, setOrgName] = useState('');
-  const [apiData, setApiData] = useState(null);
+  const [apiData, setApiData] = useState<any>(null);
 
   useEffect(() => {
     if (isAuthenticated) {
       getIdTokenClaims().then(claims => {
-        const org = claims?.org_name || claims?.['https://yourdomain/org_name'] || '';
+        const org =
+          claims?.org_name ||
+          claims?.['https://yourdomain/org_name'] ||
+          '';
         setOrgName(org);
       });
     }
@@ -41,39 +44,83 @@ function App() {
     }
   }, [orgName]);
 
-  if (isLoading) {
+  if (isLoading || !apiData) {
     return <div>Loading...</div>;
   }
 
-  // You can use orgName and apiData anywhere in App component
-  // For demonstration, here's how to log them:
-  console.log('Organization Name:', orgName);
-  console.log('API Data:', apiData);
+  // The use cases you want to support
+  const allowedUseCases = [
+    'Healthcare Price Transparency',
+    'User Feedback Analysis Dashboard',
+    'Healthcare Underwriter Dashboard',
+    'Member Dashboard'
+  ];
+
+  // Only include allowed use cases that are present in the API response
+  const selectedUseCase: string[] =
+    apiData.selectedUseCase?.filter((uc: string) =>
+      allowedUseCases.includes(uc)
+    ) || [];
 
   return (
-    <Routes>
-      <Route path="/" element={<AutoLogin />} />
-      <Route path="/callback" element={<div>Processing login...</div>} />
-      <Route element={<AuthenticationGuard component={ProtectedLayout} />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/hospital" element={<HospitalPriceDashboard />} />
-        <Route path="/feedback" element={<UserFeedbackAnalytics />} />
-        <Route path="/memberdashboard" element={<MemberHealthCopilotDashboard />} />
-      </Route>
-      <Route path="/404" element={<NotFound />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <div style={{ display: 'flex' }}>
+      <Header />
+      <Sidebar selectedUseCase={selectedUseCase} />
+      <main style={{ flexGrow: 1, padding: '24px', marginLeft: 240 }}>
+        <Routes>
+          {/* Underwriters Dashboard */}
+          {selectedUseCase.includes('Healthcare Underwriter Dashboard') && (
+            <Route
+              path="/dashboard"
+              element={
+                <AuthenticationGuard>
+                  <Dashboard />
+                </AuthenticationGuard>
+              }
+            />
+          )}
+          {/* User Feedback Analytics */}
+          {selectedUseCase.includes('User Feedback Analysis Dashboard') && (
+            <Route
+              path="/feedback"
+              element={
+                <AuthenticationGuard>
+                  <UserFeedbackAnalytics />
+                </AuthenticationGuard>
+              }
+            />
+          )}
+          {/* Hospital Transparency */}
+          {selectedUseCase.includes('Healthcare Price Transparency') && (
+            <Route
+              path="/hospital"
+              element={
+                <AuthenticationGuard>
+                  <HospitalPriceDashboard />
+                </AuthenticationGuard>
+              }
+            />
+          )}
+          {/* Member Dashboard */}
+          {selectedUseCase.includes('Member Dashboard') && (
+            <Route
+              path="/memberdashboard"
+              element={
+                <AuthenticationGuard>
+                  <MemberHealthCopilotDashboard />
+                </AuthenticationGuard>
+              }
+            />
+          )}
+          {/* AutoLogin route */}
+          <Route path="/autologin" element={<AutoLogin />} />
+          {/* Fallback */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Outlet />
+      </main>
+    </div>
   );
 }
-
-const ProtectedLayout = () => (
-  <div className="app-container">
-    <Header />
-    <Sidebar />
-    <div className="main-content">
-      <Outlet />
-    </div>
-  </div>
-);
 
 export default App;
