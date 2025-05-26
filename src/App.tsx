@@ -17,7 +17,7 @@ interface ApiData {
 }
 
 function App() {
-  const { isLoading: authLoading, isAuthenticated, getIdTokenClaims } = useAuth0();
+  const { isAuthenticated, getIdTokenClaims } = useAuth0();
   const [orgName, setOrgName] = useState('');
   const [apiData, setApiData] = useState<ApiData | null>(null);
   const navigate = useNavigate();
