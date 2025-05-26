@@ -17,7 +17,7 @@ interface ApiData {
 }
 
 function App() {
-  const {isAuthenticated, getIdTokenClaims } = useAuth0();
+  const { isLoading: authLoading, isAuthenticated, getIdTokenClaims } = useAuth0();
   const [orgName, setOrgName] = useState('');
   const [apiData, setApiData] = useState<ApiData | null>(null);
   const [apiLoading, setApiLoading] = useState(false);
@@ -78,24 +78,12 @@ function App() {
         : []
     : [];
 
-  // Show loading only during API processing after auth
+  // Show loading spinner while API is processing
   if (apiLoading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        flexDirection: 'column'
-      }}>
-        <img 
-          src="/loading.gif"  // Replace with your loading image path
-          alt="Loading..." 
-          style={{ width: 100, height: 100 }}
-        />
-        <p style={{ marginTop: 20, color: '#666' }}>
-          Loading your application configuration...
-        </p>
+      <div className="custom-loading-bg">
+        <div className="custom-spinner"></div>
+        <div className="custom-loading-text">Loading your application...</div>
       </div>
     );
   }
