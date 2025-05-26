@@ -74,10 +74,6 @@ function App() {
         : []
     : [];
 
-  if (authLoading || apiLoading) {
-    return <div>Loading application...</div>;
-  }
-
   return (
     <Routes>
       <Route path="/" element={<AutoLogin />} />
