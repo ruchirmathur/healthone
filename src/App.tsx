@@ -20,7 +20,6 @@ function App() {
   const { isAuthenticated, getIdTokenClaims } = useAuth0();
   const [orgName, setOrgName] = useState('');
   const [apiData, setApiData] = useState<ApiData | null>(null);
-  const [apiLoading, setApiLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,7 +39,7 @@ function App() {
   useEffect(() => {
     if (orgName) {
       const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
-      setApiLoading(true);
+
 
       // Artificial delay for smoother UX
       setTimeout(() => {
@@ -51,12 +50,10 @@ function App() {
           })
           .then((data: ApiData) => {
             setApiData(data);
-            setApiLoading(false);
           })
           .catch(error => {
             console.error('API Error:', error);
             setApiData({ selectedUseCase: [] });
-            setApiLoading(false);
           });
       }, 1000); // 1 second delay
     }
@@ -78,14 +75,7 @@ function App() {
         : []
     : [];
 
-  // Show loading image while API is processing
-  if (apiLoading) {
-    return (
-      <div className="loading-image-container">
-        <div style={{ marginTop: 12, color: '#555', fontSize: 18 }}>Loading your application...</div>
-      </div>
-    );
-  }
+
 
   // Layout for protected routes
   const ProtectedLayout = () => (
