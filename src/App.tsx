@@ -89,7 +89,7 @@ function App() {
 
   // Layout for protected routes
   const ProtectedLayout = () => (
-    <div className="app-root">
+    <div className="app-container">
       <Header />
       <div className="app-body">
         <Sidebar selectedUseCase={selectedUseCase} />
