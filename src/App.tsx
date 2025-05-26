@@ -20,6 +20,7 @@ function App() {
   const { isAuthenticated, getIdTokenClaims } = useAuth0();
   const [orgName, setOrgName] = useState('');
   const [apiData, setApiData] = useState<ApiData | null>(null);
+  const [apiLoading, setApiLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,6 +40,7 @@ function App() {
   useEffect(() => {
     if (orgName) {
       const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
+      setApiLoading(true);
 
       // Artificial delay for smoother UX
       setTimeout(() => {
@@ -49,10 +51,12 @@ function App() {
           })
           .then((data: ApiData) => {
             setApiData(data);
+            setApiLoading(false);
           })
           .catch(error => {
             console.error('API Error:', error);
             setApiData({ selectedUseCase: [] });
+            setApiLoading(false);
           });
       }, 1000); // 1 second delay
     }
@@ -74,14 +78,24 @@ function App() {
         : []
     : [];
 
+  // Show loading image while API is processing
+  if (apiLoading) {
+    return (
+      <div className="loading-image-container">
+        <div style={{ marginTop: 12, color: '#555', fontSize: 18 }}>Loading your application...</div>
+      </div>
+    );
+  }
 
   // Layout for protected routes
   const ProtectedLayout = () => (
-    <div style={{ display: 'flex' }}>
+    <div className="app-root">
       <Header />
-      <Sidebar selectedUseCase={selectedUseCase} />
-      <div style={{ flexGrow: 1, padding: '24px', marginLeft: 240 }}>
-        <Outlet />
+      <div className="app-body">
+        <Sidebar selectedUseCase={selectedUseCase} />
+        <main className="main-content">
+          <Outlet />
+        </main>
       </div>
     </div>
   );
@@ -92,7 +106,6 @@ function App() {
       <Route path="/callback" element={<div>Processing login...</div>} />
       
       <Route element={<AuthenticationGuard component={ProtectedLayout} />}>
-        {/* Only load Dashboard for "/" */}
         {selectedUseCase.includes('Healthcare Underwriter Dashboard') && (
           <Route path="/dashboard" element={<Dashboard />} />
         )}
@@ -105,7 +118,7 @@ function App() {
         {selectedUseCase.includes('Member Dashboard') && (
           <Route path="/memberdashboard" element={<MemberHealthCopilotDashboard />} />
         )}
-        {/* Optionally, redirect "/" to the first allowed use case */}
+        {/* Redirect "/" to the first allowed use case */}
         <Route path="/" element={<DefaultLanding selectedUseCase={selectedUseCase} />} />
       </Route>
       
