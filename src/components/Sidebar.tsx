@@ -12,7 +12,6 @@ import {
 } from '@mui/material';
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import InsightsIcon from '@mui/icons-material/Insights';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import HearingIcon from '@mui/icons-material/Hearing';
