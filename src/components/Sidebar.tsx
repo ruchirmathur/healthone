@@ -20,56 +20,25 @@ import { Link, useLocation } from 'react-router-dom';
 const drawerWidth = 240;
 const headerHeight = 64;
 
-interface NavItem {
-  text: string;
-  icon: React.ReactNode;
-  path: string;
-  useCase: string;
-}
+const iconMap: Record<string, React.ReactNode> = {
+  '/dashboard': <DashboardIcon />,
+  '/feedback': <InsightsIcon />,
+  '/hospital': <LocalHospitalIcon />,
+  '/memberdashboard': <CardGiftcardIcon />,
+  '/audioaccessible': <HearingIcon />
+};
 
-const navItems: NavItem[] = [
-  {
-    text: 'Healthcare Underwriter Dashboard',
-    icon: <DashboardIcon />,
-    path: '/dashboard',
-    useCase: 'Healthcare Underwriter Dashboard'
-  },
-  {
-    text: 'User Feedback Analysis Dashboard',
-    icon: <InsightsIcon />,
-    path: '/feedback',
-    useCase: 'User Feedback Analysis Dashboard'
-  },
-  {
-    text: 'Healthcare Price Transparency',
-    icon: <LocalHospitalIcon />,
-    path: '/hospital',
-    useCase: 'Healthcare Price Transparency'
-  },
-  {
-    text: 'Member Dashboard',
-    icon: <CardGiftcardIcon />,
-    path: '/memberdashboard',
-    useCase: 'Member Dashboard'
-  },
-  {
-    text: 'Voice Enabled Healthcare Price Transparency',
-    icon: <HearingIcon />,
-    path: '/voice-enabled',
-    useCase: 'Voice enabled Healthcare Price Transparency'
-  }
-];
+interface RouteConfig {
+  path: string;
+  label: string;
+}
 
 interface SidebarProps {
-  selectedUseCase?: string;
+  links: RouteConfig[];
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase }) => {
+const Sidebar: React.FC<SidebarProps> = ({ links }) => {
   const location = useLocation();
-
-  const filteredNavItems = navItems.filter(item => 
-    item.useCase === selectedUseCase
-  );
 
   return (
     <Drawer
@@ -98,9 +67,9 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase }) => {
       <Divider sx={{ mb: 1 }} />
       <Box sx={{ flex: 1, overflow: 'auto' }}>
         <List>
-          {filteredNavItems.map(({ text, icon, path }) => (
+          {links.map(({ label, path }) => (
             <ListItemButton
-              key={text}
+              key={path}
               component={Link}
               to={path}
               selected={location.pathname === path}
@@ -118,9 +87,9 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase }) => {
               }}
             >
               <ListItemIcon sx={{ color: location.pathname === path ? '#2155CD' : '#1a237e', minWidth: 40 }}>
-                {icon}
+                {iconMap[path] || <DashboardIcon />}
               </ListItemIcon>
-              <ListItemText primary={text} />
+              <ListItemText primary={label} />
             </ListItemButton>
           ))}
         </List>
