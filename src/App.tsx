@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Route, Routes, Outlet } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import { AutoLogin } from './pages/AutoLogin';
@@ -9,7 +10,6 @@ import UserFeedbackAnalytics from './pages/UserFeedbackAnalytics';
 import MemberHealthCopilotDashboard from './pages/MemberHealthCopilotDashboard';
 import { AuthenticationGuard } from './pages/authentication-guard';
 import NotFound from './pages/NotFound';
-import { useAuth0 } from '@auth0/auth0-react';
 import './App.css';
 
 interface ApiData {
@@ -40,7 +40,7 @@ function App() {
         })
         .then((data: ApiData) => setApiData(data))
         .catch(error => {
-          console.error('Error fetching API data:', error);
+          console.error('API Error:', error);
           setApiData({ selectedUseCase: [] });
         });
     }
@@ -53,7 +53,6 @@ function App() {
     'Member Dashboard'
   ];
 
-  // Handle both string and array responses
   const selectedUseCase = apiData?.selectedUseCase
     ? Array.isArray(apiData.selectedUseCase)
       ? apiData.selectedUseCase.filter(uc => allowedUseCases.includes(uc))
@@ -84,7 +83,7 @@ function App() {
           {selectedUseCase.includes('Member Dashboard') && (
             <Route path="/memberdashboard" element={<AuthenticationGuard component={MemberHealthCopilotDashboard} />} />
           )}
-          <Route path="/autologin" element={<AutoLogin />} />
+          <Route path="/" element={<AutoLogin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Outlet />
