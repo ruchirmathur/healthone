@@ -17,9 +17,10 @@ interface ApiData {
 }
 
 function App() {
-  const { isAuthenticated, getIdTokenClaims } = useAuth0();
+  const { isLoading: authLoading, isAuthenticated, getIdTokenClaims } = useAuth0();
   const [orgName, setOrgName] = useState('');
   const [apiData, setApiData] = useState<ApiData | null>(null);
+  const [apiLoading, setApiLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,9 +40,9 @@ function App() {
   useEffect(() => {
     if (orgName) {
       const apiHost = process.env.REACT_APP_API_BUILDER_HOST;
+      setApiLoading(true);
 
-
-      // Artificial delay for smoother UX
+      // Artificial delay for demonstration
       setTimeout(() => {
         fetch(`${apiHost}/retrieve/${encodeURIComponent(orgName)}`)
           .then(response => {
@@ -50,12 +51,14 @@ function App() {
           })
           .then((data: ApiData) => {
             setApiData(data);
+            setApiLoading(false);
           })
           .catch(error => {
             console.error('API Error:', error);
             setApiData({ selectedUseCase: [] });
+            setApiLoading(false);
           });
-      }, 1000); // 1 second delay
+      }, 1000);
     }
   }, [orgName]);
 
@@ -75,7 +78,27 @@ function App() {
         : []
     : [];
 
-
+  // Show loading only during API processing after auth
+  if (apiLoading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        flexDirection: 'column'
+      }}>
+        <img 
+          src="/loading.gif"  // Replace with your loading image path
+          alt="Loading..." 
+          style={{ width: 100, height: 100 }}
+        />
+        <p style={{ marginTop: 20, color: '#666' }}>
+          Loading your application configuration...
+        </p>
+      </div>
+    );
+  }
 
   // Layout for protected routes
   const ProtectedLayout = () => (
@@ -108,7 +131,6 @@ function App() {
         {selectedUseCase.includes('Member Dashboard') && (
           <Route path="/memberdashboard" element={<MemberHealthCopilotDashboard />} />
         )}
-        {/* Redirect "/" to the first allowed use case */}
         <Route path="/" element={<DefaultLanding selectedUseCase={selectedUseCase} />} />
       </Route>
       
