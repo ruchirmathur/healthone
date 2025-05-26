@@ -72,44 +72,28 @@ function App() {
           {selectedUseCase.includes('Healthcare Underwriter Dashboard') && (
             <Route
               path="/dashboard"
-              element={
-                <AuthenticationGuard>
-                  <Dashboard />
-                </AuthenticationGuard>
-              }
+              element={<AuthenticationGuard component={Dashboard} />}
             />
           )}
           {/* User Feedback Analytics */}
           {selectedUseCase.includes('User Feedback Analysis Dashboard') && (
             <Route
               path="/feedback"
-              element={
-                <AuthenticationGuard>
-                  <UserFeedbackAnalytics />
-                </AuthenticationGuard>
-              }
+              element={<AuthenticationGuard component={UserFeedbackAnalytics} />}
             />
           )}
           {/* Hospital Transparency */}
           {selectedUseCase.includes('Healthcare Price Transparency') && (
             <Route
               path="/hospital"
-              element={
-                <AuthenticationGuard>
-                  <HospitalPriceDashboard />
-                </AuthenticationGuard>
-              }
+              element={<AuthenticationGuard component={HospitalPriceDashboard} />}
             />
           )}
           {/* Member Dashboard */}
           {selectedUseCase.includes('Member Dashboard') && (
             <Route
               path="/memberdashboard"
-              element={
-                <AuthenticationGuard>
-                  <MemberHealthCopilotDashboard />
-                </AuthenticationGuard>
-              }
+              element={<AuthenticationGuard component={MemberHealthCopilotDashboard} />}
             />
           )}
           {/* AutoLogin route */}
