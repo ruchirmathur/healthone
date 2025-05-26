@@ -10,56 +10,49 @@ import {
   Typography,
   Avatar
 } from '@mui/material';
-
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import HearingIcon from '@mui/icons-material/Hearing';
-
 import { Link, useLocation } from 'react-router-dom';
 
 const drawerWidth = 240;
 const headerHeight = 64;
 
-// Mapping of use case names to sidebar items
-const useCaseNavMap = [
-  {
-    useCase: 'Healthcare Underwriter Dashboard',
-    text: 'Underwriters Dashboard',
-    icon: <DashboardIcon />,
+interface SidebarProps {
+  selectedUseCase: string[];
+}
+
+const navItems = [
+  { 
+    key: 'Healthcare Underwriter Dashboard',
+    text: 'Underwriters Dashboard', 
+    icon: <DashboardIcon />, 
     path: '/dashboard'
   },
-  {
-    useCase: 'User Feedback Analysis Dashboard',
-    text: 'User Feedback Analytics',
-    icon: <HearingIcon />,
+  { 
+    key: 'User Feedback Analysis Dashboard',
+    text: 'User Feedback Analytics', 
+    icon: <HearingIcon />, 
     path: '/feedback'
   },
-  {
-    useCase: 'Healthcare Price Transparency',
-    text: 'Hospital Transparency',
-    icon: <LocalHospitalIcon />,
+  { 
+    key: 'Healthcare Price Transparency',
+    text: 'Hospital Transparency', 
+    icon: <LocalHospitalIcon />, 
     path: '/hospital'
   },
-  {
-    useCase: 'Member Dashboard',
-    text: 'Member Dashboard',
-    icon: <CardGiftcardIcon />,
+  { 
+    key: 'Member Dashboard',
+    text: 'Member Dashboard', 
+    icon: <CardGiftcardIcon />, 
     path: '/memberdashboard'
   }
 ];
 
-interface SidebarProps {
-  selectedUseCase?: string[];
-}
-
 const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase }) => {
   const location = useLocation();
-
-  // Only show nav items that match selectedUseCase
-  const filteredNavItems = useCaseNavMap.filter(item =>
-    selectedUseCase?.includes(item.useCase)
-  );
+  const filteredItems = navItems.filter(item => selectedUseCase.includes(item.key));
 
   return (
     <Drawer
@@ -91,7 +84,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase }) => {
       </Box>
       <Divider />
       <List>
-        {filteredNavItems.map(({ text, icon, path }) => (
+        {filteredItems.map(({ text, icon, path }) => (
           <ListItemButton
             key={path}
             component={Link}
@@ -103,13 +96,6 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase }) => {
           </ListItemButton>
         ))}
       </List>
-      <Box sx={{ flexGrow: 1 }} />
-      <Divider />
-      <Box sx={{ textAlign: 'center', py: 2 }}>
-        <Typography variant="caption" color="textSecondary">
-          © {new Date().getFullYear()} HealthOne. All rights reserved.
-        </Typography>
-      </Box>
     </Drawer>
   );
 };
