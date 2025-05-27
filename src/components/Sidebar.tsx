@@ -21,7 +21,7 @@ const headerHeight = 64;
 
 interface SidebarProps {
   selectedUseCase: string[];
-  orgName;
+  orgName:any;
 }
 
 const navItems = [
