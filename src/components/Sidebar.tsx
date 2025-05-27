@@ -47,6 +47,12 @@ const navItems = [
     text: 'Member Dashboard', 
     icon: <CardGiftcardIcon />,
     path: '/memberdashboard'
+  },
+  { 
+    key: 'Voice enabled Healthcare Price Transparency',
+    text: 'Voice enabled Healthcare Price Transparency', 
+    icon: <LocalHospitalIcon />,
+    path: '/voicechat'
   }
 ];
 
