@@ -4,6 +4,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import { AutoLogin } from './pages/AutoLogin';
+import { Voicechat } from './pages/Voicechat';
 import Dashboard from './pages/Dashboard';
 import HospitalPriceDashboard from './pages/HospitalPriceDashboard';
 import UserFeedbackAnalytics from './pages/UserFeedbackAnalytics';
@@ -121,6 +122,9 @@ function App() {
         {selectedUseCase.includes('User Feedback Analysis Dashboard') && (
           <Route path="/feedback" element={<UserFeedbackAnalytics />} />
         )}
+        {selectedUseCase.includes('Voice enabled Healthcare Price Transparency') && (
+          <Route path="/voicechat" element={<Voicechat />} />
+        )}
         {selectedUseCase.includes('Member Dashboard') && (
           <Route path="/memberdashboard" element={<MemberHealthCopilotDashboard />} />
         )}
@@ -146,6 +150,8 @@ const DefaultLanding: React.FC<{ selectedUseCase: string[] }> = ({ selectedUseCa
       navigate('/feedback', { replace: true });
     } else if (selectedUseCase.includes('Member Dashboard')) {
       navigate('/memberdashboard', { replace: true });
+    }else if (selectedUseCase.includes('Voice enabled Healthcare Price Transparency')) {
+      navigate('/voicechat', { replace: true });
     }
   }, [selectedUseCase, navigate]);
 
