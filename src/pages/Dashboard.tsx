@@ -241,7 +241,6 @@ export const Dashboard: React.FC = () => {
   const [apiTableData, setApiTableData] = useState<ApplicationData[] | null>(null);
   const [tableError, setTableError] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
-
   const [docReviewOpen, setDocReviewOpen] = useState(false);
   const [docReviewDetails, setDocReviewDetails] = useState<ApplicationData | null>(null);
 
@@ -583,5 +582,3 @@ export const Dashboard: React.FC = () => {
     </Box>
   );
 };
-
-export default Dashboard;
