@@ -21,6 +21,7 @@ const headerHeight = 64;
 
 interface SidebarProps {
   selectedUseCase: string[];
+  orgName;
 }
 
 const navItems = [
@@ -56,7 +57,7 @@ const navItems = [
   }
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase }) => {
+const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase,orgName }) => {
   const location = useLocation();
   const filteredItems = navItems.filter(item => selectedUseCase.includes(item.key));
 
@@ -85,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedUseCase }) => {
       >
         <Avatar sx={{ bgcolor: '#2155CD', mr: 1 }}>H</Avatar>
         <Typography variant="h6" noWrap>
-          HealthOne
+          {orgName}
         </Typography>
       </Box>
       <Divider />
