@@ -4,7 +4,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import { AutoLogin } from './pages/AutoLogin';
-import { Voicechat } from './pages/Voicechat';
+import Voicechat from './pages/Voicechat';
 import Dashboard from './pages/Dashboard';
 import HospitalPriceDashboard from './pages/HospitalPriceDashboard';
 import UserFeedbackAnalytics from './pages/UserFeedbackAnalytics';
