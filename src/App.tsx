@@ -100,7 +100,7 @@ function App() {
     <div className="app-container">
       <Header orgName={orgDisplayName} headerColor={headerColor} />
       <div className="app-body">
-        <Sidebar selectedUseCase={selectedUseCase} />
+        <Sidebar selectedUseCase={selectedUseCase} orgName={orgDisplayName} />
         <main className="main-content">
           <Outlet />
         </main>
