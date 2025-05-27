@@ -69,7 +69,8 @@ function App() {
     'Healthcare Underwriter Dashboard',
     'User Feedback Analysis Dashboard',
     'Healthcare Price Transparency',
-    'Member Dashboard'
+    'Member Dashboard',
+    'Voice enabled Healthcare Price Transparency'
   ];
 
   const selectedUseCase = apiData?.selectedUseCase
