@@ -157,7 +157,7 @@ export const HospitalPriceDashboard: React.FC = () => {
         <Box sx={{ textAlign: 'center', mb: 3 }}>
           <LocalHospital sx={{ fontSize: 48, mb: 1 }} />
           <Typography variant="h3" sx={{ fontWeight: 900 }}>
-            Hospital Price Transparency
+            Healthcare Price Transparency
           </Typography>
           <Typography variant="h6" sx={{ mt: 1 }}>
             Compare procedure costs across hospitals
