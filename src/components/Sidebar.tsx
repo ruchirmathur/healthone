@@ -39,7 +39,7 @@ const navItems = [
   },
   { 
     key: 'Healthcare Price Transparency',
-    text: 'Hospital Transparency', 
+    text: 'Healthcare Price Transparency', 
     icon: <LocalHospitalIcon />,
     path: '/hospital'
   },
